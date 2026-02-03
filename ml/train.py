@@ -6,11 +6,15 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
-
+import dagshub
 import mlflow
 import mlflow.sklearn
 
-
+dagshub.init(
+    repo_owner="Sukaina22",
+    repo_name="sms-spam-mlops",
+    mlflow=True
+)
 # Use the CLEANED dataset produced by prepare_raw_data.py
 DATA_PATH = "data/processed/sms_spam_clean.csv"
 
