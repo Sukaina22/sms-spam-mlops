@@ -7,12 +7,17 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
+import mlflow
+import mlflow.sklearn
+
 
 # Use the CLEANED dataset produced by prepare_raw_data.py
 DATA_PATH = "data/processed/sms_spam_clean.csv"
 
 MODEL_DIR = "models"
 MODEL_PATH = os.path.join(MODEL_DIR, "baseline_spam_model.joblib")
+
+EXPERIMENT_NAME = "sms-spam-baseline"
 
 
 def load_data(path: str) -> pd.DataFrame:
@@ -39,7 +44,7 @@ def load_data(path: str) -> pd.DataFrame:
     return df
 
 
-def build_model() -> Pipeline:
+def build_model(max_features: int = 5000, max_iter: int = 1000) -> Pipeline:
     """
     Build a simple baseline model:
 
@@ -52,13 +57,13 @@ def build_model() -> Pipeline:
                 "tfidf",
                 TfidfVectorizer(
                     stop_words="english",
-                    max_features=5000,  # limit vocab size for speed
+                    max_features=max_features,  # limit vocab size for speed
                 ),
             ),
             (
                 "clf",
                 LogisticRegression(
-                    max_iter=1000,
+                    max_iter=max_iter,
                     random_state=42,
                 ),
             ),
@@ -68,8 +73,8 @@ def build_model() -> Pipeline:
     return pipeline
 
 
-def evaluate_model(model: Pipeline, X_test, y_test) -> None:
-    """Print accuracy, precision, recall and F1 on the test set."""
+def evaluate_model(model: Pipeline, X_test, y_test):
+    """Return accuracy, precision, recall and F1 on the test set."""
     preds = model.predict(X_test)
 
     acc = accuracy_score(y_test, preds)
@@ -77,11 +82,7 @@ def evaluate_model(model: Pipeline, X_test, y_test) -> None:
         y_test, preds, average="binary", pos_label="spam"
     )
 
-    print("\n=== Evaluation on test set ===")
-    print(f"Accuracy : {acc:.4f}")
-    print(f"Precision: {precision:.4f}")
-    print(f"Recall   : {recall:.4f}")
-    print(f"F1-score : {f1:.4f}")
+    return acc, precision, recall, f1
 
 
 def main():
@@ -93,28 +94,58 @@ def main():
     X = df["text"]
     y = df["label"]  # 'ham' or 'spam'
 
-    # Train/test split
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,
-        y,
-        test_size=0.2,
-        random_state=42,
-        stratify=y,  # keep spam/ham ratio
-    )
+    test_size = 0.2
+    max_features = 5000
+    max_iter = 1000
 
-    print("Building model...")
-    model = build_model()
+    # Set up / create experiment (local MLflow by default)
+    mlflow.set_experiment(EXPERIMENT_NAME)
 
-    print("Training model...")
-    model.fit(X_train, y_train)
+    with mlflow.start_run():
+        # Log parameters
+        mlflow.log_param("model_type", "logreg_tfidf")
+        mlflow.log_param("test_size", test_size)
+        mlflow.log_param("max_features", max_features)
+        mlflow.log_param("max_iter", max_iter)
+        mlflow.log_param("dataset_rows", len(df))
 
-    print("Evaluating model...")
-    evaluate_model(model, X_test, y_test)
+        # Train/test split
+        X_train, X_test, y_train, y_test = train_test_split(
+            X,
+            y,
+            test_size=test_size,
+            random_state=42,
+            stratify=y,  # keep spam/ham ratio
+        )
 
-    # Save the trained pipeline (vectorizer + classifier together)
-    os.makedirs(MODEL_DIR, exist_ok=True)
-    joblib.dump(model, MODEL_PATH)
-    print(f"\nModel saved to: {MODEL_PATH}")
+        print("Building model...")
+        model = build_model(max_features=max_features, max_iter=max_iter)
+
+        print("Training model...")
+        model.fit(X_train, y_train)
+
+        print("Evaluating model...")
+        acc, precision, recall, f1 = evaluate_model(model, X_test, y_test)
+
+        print("\n=== Evaluation on test set ===")
+        print(f"Accuracy : {acc:.4f}")
+        print(f"Precision: {precision:.4f}")
+        print(f"Recall   : {recall:.4f}")
+        print(f"F1-score : {f1:.4f}")
+
+        # Log metrics to MLflow
+        mlflow.log_metric("accuracy", acc)
+        mlflow.log_metric("precision", precision)
+        mlflow.log_metric("recall", recall)
+        mlflow.log_metric("f1", f1)
+
+        # Log model to MLflow (pipeline: vectorizer + classifier)
+        mlflow.sklearn.log_model(model, artifact_path="model")
+
+        # Also save to local models/ for FastAPI
+        os.makedirs(MODEL_DIR, exist_ok=True)
+        joblib.dump(model, MODEL_PATH)
+        print(f"\nModel saved to: {MODEL_PATH}")
 
 
 if __name__ == "__main__":
