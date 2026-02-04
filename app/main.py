@@ -9,6 +9,8 @@ from contextlib import contextmanager
 import uuid
 import dagshub
 import mlflow
+from ml.utils import ensure_session_id
+
 
 DB_PATH = "sms_history.db"
 DAGSHUB_OWNER = "Sukaina22"
@@ -133,7 +135,9 @@ class HistoryItem(BaseModel):
 @app.post("/predict", response_model=PredictResponse)
 def predict(request: PredictRequest):
     # Ensure we have a session_id
-    session_id = request.session_id or str(uuid.uuid4())
+    #session_id = request.session_id or str(uuid.uuid4())
+    session_id = ensure_session_id(request.session_id)
+
 
     # Run your model
     label, confidence = predict_sms(request.text)
