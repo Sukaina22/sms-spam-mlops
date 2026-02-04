@@ -10,9 +10,10 @@ import uuid
 import dagshub
 import mlflow
 from ml.utils import ensure_session_id
+import os
 
-
-DB_PATH = "sms_history.db"
+#DB_PATH = "sms_history.db"
+DB_PATH = os.getenv("DB_PATH", "sms_history.db")
 DAGSHUB_OWNER = "Sukaina22"
 DAGSHUB_REPO = "sms-spam-mlops"
 REGISTERED_MODEL_NAME = "sms_spam_classifier"
