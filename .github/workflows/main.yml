@@ -17,8 +17,8 @@ jobs:
     env:
       REGISTRY: ghcr.io
       # 👉 Change these image names if you want different ones
-      IMAGE_BACKEND: ghcr.io/${{ github.repository_owner }}/sms-spam-api
-      IMAGE_FRONTEND: ghcr.io/${{ github.repository_owner }}/sms-spam-ui
+      IMAGE_BACKEND: ghcr.io/sukaina22/sms-spam-api
+      IMAGE_FRONTEND: ghcr.io/sukaina22/sms-spam-ui
 
       # 👉 Change these to match your Koyeb app + service names
       KOYEB_APP: sms-spam-detector
