@@ -1,8 +1,8 @@
-name: CI on PR to dev
+name: CI on PR to main
 
 on:
   pull_request:
-    branches: [ "dev" ]
+    branches: [ "main" ]
 
 jobs:
   build-and-test:
@@ -18,7 +18,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # ---------- Backend (FastAPI) ----------
+      # ---------- Backend ----------
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -29,10 +29,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run backend tests (unit + integration)
+      - name: Run backend tests (pre-prod)
         run: pytest tests
 
-      # ---------- Frontend (Next.js) ----------
+      # ---------- Frontend ----------
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -40,7 +40,7 @@ jobs:
           cache: "npm"
           cache-dependency-path: ui/package-lock.json
 
-      - name: Install & build frontend
+      - name: Install & build frontend (pre-prod)
         working-directory: ui
         run: |
           npm ci
