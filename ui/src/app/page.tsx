@@ -1,12 +1,15 @@
 "use client";
 
+const API_BASE = "http://localhost:8000";
+
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getOrCreateSessionId } from "./lib/session";
 
 type ApiResponse = {
   label: string;
-  spam_probability: number;
+  confidence: number;
   session_id: string;
 };
 
@@ -42,7 +45,7 @@ export default function HomePage() {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:8000/predict", {
+      const res = await fetch(`${API_BASE}/predict`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -62,7 +65,7 @@ export default function HomePage() {
       // Update prediction from API
       setPrediction({
         label: data.label === "spam" ? "spam" : "ham",
-        confidence: data.spam_probability,
+        confidence: data.confidence,
       });
 
       // If backend returns a (possibly new) session_id, keep it in state + localStorage

@@ -1,11 +1,10 @@
 // app/history/page.tsx
 "use client";
-
+import Link from "next/link"; 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { getSessionId } from "../lib/session";
+import { getSessionId } from "../lib/session"; // 👈 make sure this exists
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "http://localhost:8000";
 
 type HistoryItem = {
   id: number;
@@ -19,9 +18,11 @@ export default function HistoryPage() {
   const [items, setItems] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [noSession, setNoSession] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const sessionId = getSessionId();
+    const sessionId = getSessionId();          // ✅ read existing session only
+
     if (!sessionId) {
       setNoSession(true);
       setLoading(false);
@@ -29,9 +30,17 @@ export default function HistoryPage() {
     }
 
     fetch(`${API_BASE}/history/${sessionId}`)
-      .then((res) => res.json())
-      .then((data) => setItems(data))
-      .catch((err) => console.error(err))
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("API error");
+        }
+        return res.json();
+      })
+      .then((data: HistoryItem[]) => setItems(data))
+      .catch((err) => {
+        console.error(err);
+        setError(err.message ?? "Failed to load history");
+      })
       .finally(() => setLoading(false));
   }, []);
 
