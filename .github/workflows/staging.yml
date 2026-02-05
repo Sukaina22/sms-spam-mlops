@@ -10,6 +10,9 @@ jobs:
 
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DAGSHUB_USER_TOKEN: ${{ 33444754da27d64f321469adb43a75ef48957dbd }}
+      MLFLOW_TRACKING_USERNAME: Sukaina22
+      MLFLOW_TRACKING_PASSWORD: ${{ 33444754da27d64f321469adb43a75ef48957dbd }}
 
     steps:
       - name: Checkout code

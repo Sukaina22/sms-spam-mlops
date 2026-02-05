@@ -16,6 +16,9 @@ jobs:
       IMAGE_FRONTEND: sms-ui
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      DAGSHUB_USER_TOKEN: ${{ 33444754da27d64f321469adb43a75ef48957dbd }}
+      MLFLOW_TRACKING_USERNAME: Sukaina22
+      MLFLOW_TRACKING_PASSWORD: ${{ 33444754da27d64f321469adb43a75ef48957dbd }}
 
     steps:
       - name: Checkout code
