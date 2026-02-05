@@ -46,7 +46,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           # 👉 Change if your backend folder is not ./backend
-          context: ./app
+          context: .
           file: ./app/Dockerfile
           push: true
           tags: |
@@ -60,7 +60,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           # 👉 Change if your frontend folder is not ./frontend
-          context: ./ui
+          context: .
           file: ./ui/Dockerfile
           push: true
           tags: |
