@@ -9,4 +9,6 @@ fastapi
 uvicorn
 jinja2
 python-multipart
-
+pytest
+httpx
+pytest-asyncio

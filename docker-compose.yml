@@ -1,0 +1,25 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    image: sms-api:local
+    container_name: sms-api
+    env_file:
+      - app/.env
+    ports:
+      - "8000:8000"
+
+  ui:
+    build:
+      context: .
+      dockerfile: ui/Dockerfile
+    image: sms-ui:local
+    container_name: sms-ui
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+
+volumes:
+  sms_api_data:
