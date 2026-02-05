@@ -1,35 +1,62 @@
-name: Sync dev to staging
+name: Sync dev to staging and run staging tests
 
 on:
   push:
     branches: [ "dev" ]
 
-permissions:
-  contents: write   # needed to push to staging
-
 jobs:
-  sync-dev-to-staging:
+  sync-and-test:
     runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DAGSHUB_USER_TOKEN: ${{ secrets.DAGSHUB_USER_TOKEN }}
+      MLFLOW_TRACKING_USERNAME: Sukaina22
+      MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_USER_TOKEN }}
 
     steps:
       - name: Checkout dev
         uses: actions/checkout@v4
         with:
           ref: dev
-          fetch-depth: 0
 
-      - name: Configure git
+      - name: Configure git identity
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Update staging branch from dev
+      - name: Sync dev to staging
         run: |
-          # Make sure we have all remote branches
           git fetch origin
-
-          # Create/overwrite local staging from dev
-          git checkout -B staging dev
-
-          # Force-push staging to match dev exactly
+          # Move local staging to dev commit
+          git branch -f staging dev
+          # Push updated staging (uses GITHUB_TOKEN)
           git push origin staging --force
+
+      # ---------- Backend (FastAPI) ----------
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install backend dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run staging backend tests
+        run: pytest tests
+
+      # ---------- Frontend (Next.js) ----------
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: ui/package-lock.json
+
+      - name: Install & build frontend (staging)
+        working-directory: ui
+        run: |
+          npm ci
+          npm run build

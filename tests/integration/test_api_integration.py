@@ -17,34 +17,13 @@ if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
 # -------------------------------------------------------------------------
-# 2. Use a SEPARATE DB for tests
-#    This avoids touching your real sms_history.db
+# 2. Import FastAPI app
+#    The app itself is responsible for connecting to whatever DB is configured
+#    via env vars / settings. Tests should not know about DB details.
 # -------------------------------------------------------------------------
-TEST_DB_PATH = os.path.join(ROOT_DIR, "test_sms_history.db")
-os.environ["DB_PATH"] = TEST_DB_PATH  # <- main.py reads this as DB_PATH
+from app.main import app  # noqa: E402
 
-# Now we can safely import the FastAPI app and init_db from app.main
-from app.main import app, init_db   # noqa: E402
-
-# FastAPI TestClient – no need to run uvicorn
 client = TestClient(app)
-
-
-# -------------------------------------------------------------------------
-# 3. Global setup for this module
-#    Runs ONCE before all tests in this file
-# -------------------------------------------------------------------------
-def setup_module(module):
-    """
-    Ensure a clean test DB with the 'predictions' table created.
-    """
-    # Remove old test DB if it exists
-    if os.path.exists(TEST_DB_PATH):
-        os.remove(TEST_DB_PATH)
-
-    # Recreate DB + 'predictions' table for tests
-    init_db()
-# -------------------------------------------------------------------------
 
 
 def test_predict_returns_label_and_probability():
@@ -66,7 +45,6 @@ def test_predict_returns_label_and_probability():
 
     assert data["label"] in ("spam", "ham")
     assert 0.0 <= float(data["confidence"]) <= 1.0
-
 
 
 def test_predict_creates_history_entry():
