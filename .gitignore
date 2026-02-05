@@ -3,3 +3,8 @@ __pycache__/
 *.pyc
 .mlflow/
 .dvc/cache/
+models/
+mlruns/
+mlflow.db
+.env
+app/.env

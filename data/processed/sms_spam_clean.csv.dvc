@@ -1,0 +1,5 @@
+outs:
+- md5: cc9c1261b294123db12d512dfa7a02d0
+  size: 484832
+  hash: md5
+  path: sms_spam_clean.csv
