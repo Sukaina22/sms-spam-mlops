@@ -17,26 +17,12 @@ if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
 # -------------------------------------------------------------------------
-# 2. Use a separate DB for E2E tests
-#    (keeps things isolated from unit/integration and from real db)
+# 2. Import FastAPI app – no direct DB handling here
+#    The app itself is responsible for connecting to whatever DB is configured.
 # -------------------------------------------------------------------------
-E2E_DB_PATH = os.path.join(ROOT_DIR, "test_sms_history_e2e.db")
-os.environ["DB_PATH"] = E2E_DB_PATH
-
-from app.main import app, init_db  # noqa: E402
+from app.main import app  # noqa: E402
 
 client = TestClient(app)
-
-
-def setup_module(module):
-    """
-    Runs once before all E2E tests in this file.
-    Ensures a clean DB with the 'predictions' table created.
-    """
-    if os.path.exists(E2E_DB_PATH):
-        os.remove(E2E_DB_PATH)
-    init_db()
-# -------------------------------------------------------------------------
 
 
 def test_e2e_spam_flow_predict_then_history():
@@ -105,7 +91,7 @@ def test_e2e_multiple_messages_single_session():
 
     history = resp_history.json()
     assert isinstance(history, list)
-    # At least as many items as messages we sent (could be more if other tests reuse session)
+    # At least as many items as messages we sent
     assert len(history) >= len(messages)
 
     # Extract texts from history and ensure all messages are present
