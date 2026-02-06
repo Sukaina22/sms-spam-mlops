@@ -77,24 +77,25 @@ jobs:
           $HOME/.koyeb/bin/koyeb version || true
 
 
-      # ============================
-      # Authenticate Koyeb CLI
-      # ============================
-      - name: Authenticate with Koyeb
+      - name: Check Koyeb CLI access (optional)
         env:
           KOYEB_API_TOKEN: ${{ secrets.KOYEB_API_TOKEN }}
         run: |
-          koyeb auth login --api-key "$KOYEB_API_TOKEN"
+          koyeb --token "$KOYEB_API_TOKEN" apps list || echo "Koyeb CLI check failed, but continuing..."
+
 
       # ============================
       # Deploy BACKEND to Koyeb
       # ============================
       - name: Deploy backend service
+        env:
+          KOYEB_API_TOKEN: ${{ secrets.KOYEB_API_TOKEN }}
         run: |
           echo "Updating backend service $KOYEB_BACKEND_SERVICE in app $KOYEB_APP ..."
-          koyeb service update "$KOYEB_BACKEND_SERVICE" \
+          koyeb --token "$KOYEB_API_TOKEN" service update "$KOYEB_BACKEND_SERVICE" \
             --app "$KOYEB_APP" \
             --docker "${IMAGE_BACKEND}:${GITHUB_SHA}"
+
 
       # ============================
       # Deploy FRONTEND to Koyeb
@@ -105,3 +106,4 @@ jobs:
           koyeb service update "$KOYEB_FRONTEND_SERVICE" \
             --app "$KOYEB_APP" \
             --docker "${IMAGE_FRONTEND}:${GITHUB_SHA}"
+
