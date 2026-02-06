@@ -23,8 +23,8 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # --- Copy source code ---
 # Copy backend + ml code into image
-COPY ../app /app/app
-COPY ../ml /app/ml
+COPY app /app/app
+COPY ml /app/ml
 
 # (Optional) if you need model files, mlruns, etc., you can copy them too:
 # COPY ../models /app/models

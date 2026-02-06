@@ -46,7 +46,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           # 👉 Change if your backend folder is not ./backend
-          context: ./app
+          context: .
           file: ./app/Dockerfile
           push: true
           tags: |
@@ -60,7 +60,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           # 👉 Change if your frontend folder is not ./frontend
-          context: ./ui
+          context: .
           file: ./ui/Dockerfile
           push: true
           tags: |
@@ -73,8 +73,10 @@ jobs:
       - name: Install Koyeb CLI
         run: |
           curl -fsSL https://raw.githubusercontent.com/koyeb/koyeb-cli/master/install.sh | sh
-          sudo mv koyeb /usr/local/bin/koyeb
-          koyeb --version
+          # Add Koyeb CLI to PATH for the rest of the job
+          echo "$HOME/.koyeb/bin" >> $GITHUB_PATH
+          $HOME/.koyeb/bin/koyeb --version
+
 
       # ============================
       # Authenticate Koyeb CLI
