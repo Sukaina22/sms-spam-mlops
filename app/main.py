@@ -43,6 +43,9 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 # ---------- MODEL LOADING (PUT YOUR EXISTING CODE HERE) ----------
 
 def load_model():
+    token = os.getenv("DAGSHUB_TOKEN")
+    if token:
+        dagshub.auth.add_app_token(token)
     dagshub.init(
         repo_owner=DAGSHUB_OWNER,
         repo_name=DAGSHUB_REPO,
