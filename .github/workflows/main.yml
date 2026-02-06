@@ -102,9 +102,11 @@ jobs:
       # Deploy FRONTEND to Koyeb
       # ============================
       - name: Deploy frontend service
+        env:
+          KOYEB_API_TOKEN: ${{ secrets.KOYEB_API_TOKEN }}
         run: |
           echo "Updating frontend service $KOYEB_FRONTEND_SERVICE in app $KOYEB_FRONTEND_APP ..."
-          koyeb service update "$KOYEB_FRONTEND_SERVICE" \
+          koyeb --token "$KOYEB_API_TOKEN" service update "$KOYEB_FRONTEND_SERVICE" \
             --app "$KOYEB_FRONTEND_APP" \
             --docker "${IMAGE_FRONTEND}:${GITHUB_SHA}"
 
