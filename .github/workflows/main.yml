@@ -22,8 +22,8 @@ jobs:
 
       # 👉 Change these to match your Koyeb app + service names
       KOYEB_APP: sms-spam-detector
-      KOYEB_BACKEND_SERVICE: sms-spam-api
-      KOYEB_FRONTEND_SERVICE: sms-spam-ui
+      KOYEB_BACKEND_SERVICE: api-sms-spam-detector
+      KOYEB_FRONTEND_SERVICE: sms-spam-detector
 
     steps:
       - name: Checkout repository
