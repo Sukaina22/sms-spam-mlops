@@ -21,9 +21,10 @@ jobs:
       IMAGE_FRONTEND: ghcr.io/sukaina22/sms-spam-ui
 
       # 👉 Change these to match your Koyeb app + service names
-      KOYEB_APP: sms-spam-detector
-      KOYEB_BACKEND_SERVICE: api-sms-spam-detector
-      KOYEB_FRONTEND_SERVICE: sms-spam-detector
+      KOYEB_BACKEND_APP: sms-spam-detector-api
+      KOYEB_BACKEND_SERVICE: sms-spam-api
+      KOYEB_FRONTEND_APP: sms-spam-detector-ui
+      KOYEB_FRONTEND_SERVICE: sms-spam-ui
 
     steps:
       - name: Checkout repository
