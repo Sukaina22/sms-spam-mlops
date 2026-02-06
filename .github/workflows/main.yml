@@ -73,9 +73,8 @@ jobs:
       - name: Install Koyeb CLI
         run: |
           curl -fsSL https://raw.githubusercontent.com/koyeb/koyeb-cli/master/install.sh | sh
-          # Add Koyeb CLI to PATH for the rest of the job
           echo "$HOME/.koyeb/bin" >> $GITHUB_PATH
-          $HOME/.koyeb/bin/koyeb --version
+          $HOME/.koyeb/bin/koyeb version || true
 
 
       # ============================
