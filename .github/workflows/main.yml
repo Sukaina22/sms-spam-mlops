@@ -92,9 +92,9 @@ jobs:
         env:
           KOYEB_API_TOKEN: ${{ secrets.KOYEB_API_TOKEN }}
         run: |
-          echo "Updating backend service $KOYEB_BACKEND_SERVICE in app $KOYEB_APP ..."
+          echo "Updating backend service $KOYEB_BACKEND_SERVICE in app $KOYEB_BACKEND_APP ..."
           koyeb --token "$KOYEB_API_TOKEN" service update "$KOYEB_BACKEND_SERVICE" \
-            --app "$KOYEB_APP" \
+            --app "$KOYEB_BACKEND_APP" \
             --docker "${IMAGE_BACKEND}:${GITHUB_SHA}"
 
 
@@ -103,8 +103,8 @@ jobs:
       # ============================
       - name: Deploy frontend service
         run: |
-          echo "Updating frontend service $KOYEB_FRONTEND_SERVICE in app $KOYEB_APP ..."
+          echo "Updating frontend service $KOYEB_FRONTEND_SERVICE in app $KOYEB_FRONTEND_APP ..."
           koyeb service update "$KOYEB_FRONTEND_SERVICE" \
-            --app "$KOYEB_APP" \
+            --app "$KOYEB_FRONTEND_APP" \
             --docker "${IMAGE_FRONTEND}:${GITHUB_SHA}"
 
