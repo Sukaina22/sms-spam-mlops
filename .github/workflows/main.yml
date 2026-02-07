@@ -54,6 +54,14 @@ jobs:
             ${{ env.IMAGE_BACKEND }}:latest
             ${{ env.IMAGE_BACKEND }}:${{ github.sha }}
 
+      - name: Verify NEXT_PUBLIC_API_BASE_URL secret is set
+        run: |
+          if [ -z "${{ secrets.NEXT_PUBLIC_API_BASE_URL }}" ]; then
+            echo "ERROR: NEXT_PUBLIC_API_BASE_URL secret is not set"; exit 1;
+          else
+            echo "NEXT_PUBLIC_API_BASE_URL secret is present";
+          fi
+
       # ============================
       # Build & push FRONTEND image
       # ============================
