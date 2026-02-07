@@ -26,6 +26,8 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string>("");
+  const [userGuess, setUserGuess] = useState<"spam" | "ham" | null>(null); 
+  const isCorrectGuess = prediction && userGuess && prediction.label === userGuess;
 
   useEffect(() => {
     const id = getOrCreateSessionId();
@@ -52,6 +54,7 @@ export default function HomePage() {
         body: JSON.stringify({
           text: message,
           session_id: sessionId,
+          user_label: userGuess, 
         }),
       });
 
@@ -81,6 +84,7 @@ export default function HomePage() {
     setMessage("");
     setPrediction(null);
     setError(null);
+    setUserGuess(null);
   };
 
   return (
@@ -101,12 +105,22 @@ export default function HomePage() {
           </div>
 
           {}
-          <Link
-            href="/history"
-            className="text-xs rounded-lg bg-slate-900 border border-slate-700 px-3 py-1.5 text-slate-200 hover:bg-slate-800"
-          >
-            View Session History
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/dashboard"
+              className="text-xs rounded-lg bg-slate-900 border border-slate-700 px-3 py-1.5 text-slate-200 hover:bg-slate-800"
+            >
+              Overview
+            </Link>
+
+            <Link
+              href="/history"
+              className="text-xs rounded-lg bg-slate-900 border border-slate-700 px-3 py-1.5 text-slate-200 hover:bg-slate-800"
+            >
+              View Session History
+            </Link>
+          </div>
+
         </div>
       </header>
 
@@ -132,6 +146,50 @@ export default function HomePage() {
             />
 
             {error && <p className="mt-2 text-xs text-rose-400">{error}</p>}
+
+            {}
+            <div className="mt-4 p-3 rounded-xl border border-slate-800 bg-slate-950/70">
+              <p className="text-xs font-medium text-center mb-2">
+                🧠 Make a guess before you get the answer!
+              </p>
+              <p className="text-[11px] text-slate-400 text-center mb-3">
+                Do you think this SMS is spam or not? Your guess will be saved to help improve the model.
+              </p>
+
+              <div className="flex justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setUserGuess("spam")}
+                  className={`px-4 py-2 rounded-lg text-xs font-semibold border transition ${
+                    userGuess === "spam"
+                      ? "bg-rose-500 text-slate-950 border-rose-400"
+                      : "bg-slate-900 text-rose-300 border-rose-500/60 hover:bg-slate-800"
+                  }`}
+                >
+                  🚫 Spam
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setUserGuess("ham")}
+                  className={`px-4 py-2 rounded-lg text-xs font-semibold border transition ${
+                    userGuess === "ham"
+                      ? "bg-emerald-500 text-slate-950 border-emerald-400"
+                      : "bg-slate-900 text-emerald-300 border-emerald-500/60 hover:bg-slate-800"
+                  }`}
+                >
+                  ✅ Not Spam
+                </button>
+              </div>
+
+              {userGuess && (
+                <p className="mt-2 text-[11px] text-center text-slate-400">
+                  You&apos;ve guessed:{" "}
+                  <span className="font-semibold">
+                    {userGuess === "spam" ? "Spam" : "Not Spam"}
+                  </span>
+                </p>
+              )}
+            </div>
 
             <div className="mt-4 flex justify-between items-center gap-3">
               <button
@@ -163,53 +221,81 @@ export default function HomePage() {
             )}
 
             {prediction && (
-              <>
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <span className="text-xs text-slate-400">
-                      Classification
-                    </span>
-                    <span
-                      className={`mt-1 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
-                        prediction.label === "spam"
-                          ? "bg-rose-500/10 text-rose-300 border border-rose-500/40"
-                          : "bg-emerald-500/10 text-emerald-300 border border-emerald-500/40"
-                      }`}
-                    >
-                      <span className="inline-block h-2 w-2 rounded-full bg-current" />
-                      {prediction.label === "spam" ? "Spam" : "Not Spam"}
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-xs text-slate-400">
-                      Confidence (spam)
-                    </span>
-                    <p className="text-lg font-semibold">
-                      {(prediction.confidence * 100).toFixed(1)}%
-                    </p>
-                  </div>
-                </div>
+  <>
+          {}
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col">
+              <span className="text-xs text-slate-400">Model prediction</span>
+              <span
+                className={`mt-1 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
+                  prediction.label === "spam"
+                    ? "bg-rose-500/10 text-rose-300 border border-rose-500/40"
+                    : "bg-emerald-500/10 text-emerald-300 border border-emerald-500/40"
+                }`}
+              >
+                <span className="inline-block h-2 w-2 rounded-full bg-current" />
+                {prediction.label === "spam" ? "Spam" : "Not Spam"}
+              </span>
+            </div>
 
-                <div className="border-t border-slate-800 pt-3">
-                  <p className="text-xs text-slate-400 mb-1">
-                    Explanation (placeholder)
-                  </p>
-                  <p className="text-xs text-slate-300">
-                    Later you can highlight suspicious words or show model
-                    explanations here. For now we only show the prediction and
-                    spam probability.
-                  </p>
-                </div>
-              </>
-            )}
-
-            <div className="mt-auto pt-2 border-t border-slate-900">
+            <div className="text-right">
+              <span className="text-xs text-slate-400">Confidence (spam)</span>
+              <p className="text-lg font-semibold">
+                {(prediction.confidence * 100).toFixed(1)}%
+              </p>
               <p className="text-[11px] text-slate-500">
-                Roadmap: feedback buttons, history, user login, model
-                versioning, and analytics dashboard will be added on separate
-                pages.
+                Higher = model is more sure it&apos;s spam.
               </p>
             </div>
+          </div>
+
+          {}
+          {userGuess && (
+            <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/70 p-3">
+              <div className="flex items-center justify-between gap-3">
+                <div className="text-xs">
+                  <p className="text-slate-400 mb-1">Your guess</p>
+                  <span
+                    className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold border ${
+                      userGuess === "spam"
+                        ? "bg-rose-500/10 text-rose-300 border-rose-500/50"
+                        : "bg-emerald-500/10 text-emerald-300 border-emerald-500/50"
+                    }`}
+                  >
+                    {userGuess === "spam" ? "🚫 Spam" : "✅ Not Spam"}
+                  </span>
+                </div>
+
+                <div className="text-right text-xs">
+                  {isCorrectGuess ? (
+                    <p className="text-emerald-400 font-medium">
+                      🎉 You guessed it right!
+                    </p>
+                  ) : (
+                    <p className="text-rose-300 font-medium">
+                      🤖 The model disagreed with your guess.
+                    </p>
+                  )}
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    We store both to analyze where humans and the model differ.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {}
+          <div className="border-t border-slate-800 pt-3 mt-3">
+            <p className="text-xs text-slate-400 mb-1">What this means</p>
+            <p className="text-xs text-slate-300">
+              The model was trained on real SMS messages and outputs whether a message
+              looks like spam or not, along with how confident it is that the message
+              is spam. Your guess helps us understand how humans perceive the same
+              SMS.
+            </p>
+          </div>
+        </>
+      )}
           </section>
         </div>
       </div>
