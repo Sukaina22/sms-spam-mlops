@@ -4,15 +4,16 @@ from typing import List, Tuple
 import uuid
 import dagshub
 import mlflow
-from app.dataTransfers import HistoryItem, PredictRequest, PredictResponse
+from app.dataTransfers import HistoryItem, PredictRequest, PredictResponse, StatsResponse
 import os
 import os
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker
 from app.models import Base
 from app.models import Prediction
 from fastapi import Depends
 from sqlalchemy.orm import Session
+from datetime import timedelta, datetime
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 DAGSHUB_OWNER = "Sukaina22"
@@ -138,3 +139,58 @@ def get_history(
         )
 
     return history
+
+@app.get("/stats", response_model=StatsResponse)
+def get_stats(db: Session = Depends(get_db)):
+    total = db.query(func.count(Prediction.id)).scalar() or 0
+
+    spam_count = (
+        db.query(func.count(Prediction.id))
+        .filter(Prediction.label == "spam")
+        .scalar()
+        or 0
+    )
+    ham_count = total - spam_count
+    spam_rate = float(spam_count) / float(total) if total > 0 else 0.0
+
+    since_24h = datetime.utcnow() - timedelta(hours=24)
+    last_24h = (
+        db.query(func.count(Prediction.id))
+        .filter(Prediction.created_at >= since_24h)
+        .scalar()
+        or 0
+    )
+
+    unique_sessions = (
+        db.query(func.count(func.distinct(Prediction.session_id))).scalar() or 0
+    )
+
+    with_user_label = (
+        db.query(func.count(Prediction.id))
+        .filter(Prediction.user_label.isnot(None))
+        .scalar()
+        or 0
+    )
+
+    agreement = (
+        db.query(func.count(Prediction.id))
+        .filter(
+            Prediction.user_label.isnot(None),
+            Prediction.user_label == Prediction.label,
+        )
+        .scalar()
+        or 0
+    )
+    disagreement = with_user_label - agreement
+
+    return StatsResponse(
+        total_predictions=total,
+        spam_count=spam_count,
+        ham_count=ham_count,
+        spam_rate=spam_rate,
+        last_24h_predictions=last_24h,
+        unique_sessions=unique_sessions,
+        with_user_label=with_user_label,
+        user_model_agreement=agreement,
+        user_model_disagreement=disagreement,
+    )

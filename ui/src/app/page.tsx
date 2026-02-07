@@ -105,12 +105,22 @@ export default function HomePage() {
           </div>
 
           {}
-          <Link
-            href="/history"
-            className="text-xs rounded-lg bg-slate-900 border border-slate-700 px-3 py-1.5 text-slate-200 hover:bg-slate-800"
-          >
-            View Session History
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/dashboard"
+              className="text-xs rounded-lg bg-slate-900 border border-slate-700 px-3 py-1.5 text-slate-200 hover:bg-slate-800"
+            >
+              Overview
+            </Link>
+
+            <Link
+              href="/history"
+              className="text-xs rounded-lg bg-slate-900 border border-slate-700 px-3 py-1.5 text-slate-200 hover:bg-slate-800"
+            >
+              View Session History
+            </Link>
+          </div>
+
         </div>
       </header>
 
@@ -212,7 +222,7 @@ export default function HomePage() {
 
             {prediction && (
   <>
-          {/* Top row: model prediction & confidence */}
+          {}
           <div className="flex items-center justify-between gap-4">
             <div className="flex flex-col">
               <span className="text-xs text-slate-400">Model prediction</span>
@@ -239,7 +249,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Middle row: compare with user guess (if any) */}
+          {}
           {userGuess && (
             <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/70 p-3">
               <div className="flex items-center justify-between gap-3">
@@ -274,7 +284,7 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* Bottom: short explanation text */}
+          {}
           <div className="border-t border-slate-800 pt-3 mt-3">
             <p className="text-xs text-slate-400 mb-1">What this means</p>
             <p className="text-xs text-slate-300">
