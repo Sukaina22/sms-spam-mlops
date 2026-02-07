@@ -60,8 +60,8 @@ def test_history_is_isolated_per_session():
     session_a = str(uuid4())
     session_b = str(uuid4())
 
-    sms_a = "Message for session A only."
-    sms_b = "Message for session B only."
+    sms_a = "Earn $500/day working from home. No experience needed."
+    sms_b = "Payment of $75 was successfully completed."
 
     resp_a = client.post(
         "/predict",
