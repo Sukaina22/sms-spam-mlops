@@ -1,4 +1,3 @@
-// app/lib/session.ts (create this file)
 export const SESSION_KEY = "sms_session_id";
 
 export function getOrCreateSessionId(): string {

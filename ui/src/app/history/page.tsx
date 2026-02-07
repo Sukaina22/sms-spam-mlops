@@ -1,8 +1,7 @@
-// app/history/page.tsx
 "use client";
 import Link from "next/link"; 
 import { useEffect, useState } from "react";
-import { getSessionId } from "../lib/session"; // 👈 make sure this exists
+import { getSessionId } from "../lib/session";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -21,7 +20,7 @@ export default function HistoryPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const sessionId = getSessionId();          // ✅ read existing session only
+    const sessionId = getSessionId();
 
     if (!sessionId) {
       setNoSession(true);
