@@ -118,6 +118,7 @@ app = FastAPI(title="SMS Spam Detector API")
 origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "https://sms-spam-detector.koyeb.app"
 ]
 app.add_middleware(
     CORSMiddleware,
