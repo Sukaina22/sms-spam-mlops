@@ -1,4 +1,5 @@
 from app.dataTransfers import HistoryItem, PredictRequest, PredictResponse, StatsResponse
+from types import SimpleNamespace
 
 def test_predict_request_create():
     req = PredictRequest.create(
@@ -27,13 +28,14 @@ from datetime import datetime
 def test_history_item_from_db():
     now = datetime.utcnow()
 
-    row = {
-        "id": 1,
-        "sms_text": "Win money now",
-        "label": "spam",
-        "confidence": 0.95,
-        "created_at": now,
-    }
+    row = SimpleNamespace(
+        id=1,
+        sms_text="Win money now",
+        label="spam",
+        confidence=0.95,
+        created_at=now,
+        user_label=None,
+    )
 
     item = HistoryItem.from_db(row)
 
@@ -41,7 +43,7 @@ def test_history_item_from_db():
     assert item.sms_text == "Win money now"
     assert item.label == "spam"
     assert item.confidence == 0.95
-    assert item.created_at == now
+    assert item.created_at == now.isoformat()
 
 def test_stats_response_spam_rate_calculation():
     stats = StatsResponse.from_counts(
