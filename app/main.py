@@ -19,6 +19,7 @@ DAGSHUB_OWNER = "Sukaina22"
 DAGSHUB_REPO = "sms-spam-mlops"
 REGISTERED_MODEL_NAME = "sms_spam_classifier"
 MODEL_URI = "models:/sms_spam_classifier/2"
+MODEL_VERSION = os.getenv("MODEL_VERSION", "v2")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -94,6 +95,8 @@ def predict(request: PredictRequest, db: Session = Depends(get_db),):
         sms_text=request.text,
         label=label,
         confidence=float(confidence),
+        model_version=MODEL_VERSION,
+        user_label=request.user_label,
     )
 
     db.add(prediction)

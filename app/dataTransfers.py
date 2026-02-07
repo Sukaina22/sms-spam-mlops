@@ -1,9 +1,11 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
 
 class PredictRequest(BaseModel):
     text: str
-    session_id: str | None = None  # frontend may omit
+    session_id: str | None = None  
+    user_label: Optional[str] = None
 
 class PredictResponse(BaseModel):
     label: str
