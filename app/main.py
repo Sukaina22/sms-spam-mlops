@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Tuple
 import uuid
@@ -6,13 +6,9 @@ import dagshub
 import mlflow
 from app.dataTransfers import HistoryItem, PredictRequest, PredictResponse, StatsResponse
 import os
-import os
 from sqlalchemy import create_engine, func
-from sqlalchemy.orm import sessionmaker
-from app.models import Base
-from app.models import Prediction
-from fastapi import Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import sessionmaker, Session
+from app.models import Base, Prediction
 from datetime import timedelta, datetime
 
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -105,10 +101,9 @@ def predict(request: PredictRequest, db: Session = Depends(get_db),):
     db.refresh(prediction)
     db.close()
 
-
-    return PredictResponse(
+    return PredictResponse.from_prediction(
         label=label,
-        confidence=float(confidence),
+        confidence=confidence,
         session_id=session_id,
     )
 
@@ -126,17 +121,7 @@ def get_history(
         .all()
     )
 
-    history: List[HistoryItem] = []
-    for row in rows:
-        history.append(
-            HistoryItem(
-                id=row.id,
-                sms_text=row.sms_text,
-                label=row.label,
-                confidence=row.confidence,
-                created_at=row.created_at.isoformat() if row.created_at else None,
-            )
-        )
+    history: List[HistoryItem] = [HistoryItem.from_db(row) for row in rows]
 
     return history
 
@@ -151,7 +136,6 @@ def get_stats(db: Session = Depends(get_db)):
         or 0
     )
     ham_count = total - spam_count
-    spam_rate = float(spam_count) / float(total) if total > 0 else 0.0
 
     since_24h = datetime.utcnow() - timedelta(hours=24)
     last_24h = (
@@ -183,11 +167,10 @@ def get_stats(db: Session = Depends(get_db)):
     )
     disagreement = with_user_label - agreement
 
-    return StatsResponse(
+    return StatsResponse.from_counts(
         total_predictions=total,
         spam_count=spam_count,
         ham_count=ham_count,
-        spam_rate=spam_rate,
         last_24h_predictions=last_24h,
         unique_sessions=unique_sessions,
         with_user_label=with_user_label,

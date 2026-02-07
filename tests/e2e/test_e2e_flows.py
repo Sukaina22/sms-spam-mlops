@@ -76,10 +76,10 @@ def test_e2e_multi_session_isolation_and_counts():
     session_b = str(uuid4())
 
     msgs_a = [
-        "This is session A - first message",
-        "This is session A - second message",
+        "Claim your lottery prize before it expires. Call +44 7700 900123",
+        "I'll call you when I arrive.",
     ]
-    msg_b = "This is session B - only message"
+    msg_b = "You've been shortlisted. Pay registration fee to proceed."
 
     for msg in msgs_a:
         resp = client.post(
