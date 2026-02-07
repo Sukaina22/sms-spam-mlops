@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime
+from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy.orm import declarative_base
 
@@ -13,3 +13,12 @@ class Prediction(Base):
     label = Column(String, nullable=False)
     confidence = Column(Float, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    # 👇 NEW FIELDS FOR OFFLINE RETRAINING
+    # ground-truth label (optional, you’ll fill it later manually or via an admin UI)
+    user_label = Column(String, nullable=True)
+
+    # which model produced this prediction (e.g. "v1", "2", "2026-02-06")
+    model_version = Column(String, nullable=True)
+
+    # whether this row has already been used in an offline retraining job
+    used_for_training = Column(Boolean, nullable=False, default=False)
