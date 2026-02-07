@@ -27,7 +27,6 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string>("");
 
-  // Initialize / ensure session ID on first load
   useEffect(() => {
     const id = getOrCreateSessionId();
     setSessionId(id);
@@ -52,7 +51,7 @@ export default function HomePage() {
         },
         body: JSON.stringify({
           text: message,
-          session_id: sessionId, // send session id to backend
+          session_id: sessionId,
         }),
       });
 
@@ -62,13 +61,11 @@ export default function HomePage() {
 
       const data: ApiResponse = await res.json();
 
-      // Update prediction from API
       setPrediction({
         label: data.label === "spam" ? "spam" : "ham",
         confidence: data.confidence,
       });
 
-      // If backend returns a (possibly new) session_id, keep it in state + localStorage
       if (data.session_id && data.session_id !== sessionId) {
         localStorage.setItem("sms_session_id", data.session_id);
         setSessionId(data.session_id);
@@ -88,7 +85,7 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-      {/* Top bar */}
+      {}
       <header className="w-full border-b border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -103,7 +100,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Link to history page */}
+          {}
           <Link
             href="/history"
             className="text-xs rounded-lg bg-slate-900 border border-slate-700 px-3 py-1.5 text-slate-200 hover:bg-slate-800"
@@ -113,10 +110,10 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Content */}
+      {}
       <div className="flex-1 flex items-center justify-center px-4">
         <div className="w-full max-w-3xl grid gap-6 md:grid-cols-[2fr,1.2fr] items-start mt-8 mb-16">
-          {/* Left: Input */}
+          {}
           <section className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl shadow-slate-950/60">
             <h1 className="text-xl font-semibold mb-1">Test an SMS</h1>
             <p className="text-sm text-slate-400 mb-4">
@@ -154,7 +151,7 @@ export default function HomePage() {
             </div>
           </section>
 
-          {/* Right: Result */}
+          {}
           <section className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4 shadow-xl shadow-slate-950/60">
             <h2 className="text-sm font-semibold">Prediction</h2>
 

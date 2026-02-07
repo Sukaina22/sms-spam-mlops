@@ -33,7 +33,6 @@ jobs:
           # Push updated staging (uses GITHUB_TOKEN)
           git push origin staging --force
 
-      # ---------- Backend (FastAPI) ----------
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -47,7 +46,6 @@ jobs:
       - name: Run staging backend tests
         run: pytest tests
 
-      # ---------- Frontend (Next.js) ----------
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:

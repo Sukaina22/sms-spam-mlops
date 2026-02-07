@@ -7,7 +7,7 @@ on:
 
 permissions:
   contents: read
-  packages: write   # needed to push to GHCR
+  packages: write
   id-token: write
 
 jobs:
@@ -16,11 +16,9 @@ jobs:
 
     env:
       REGISTRY: ghcr.io
-      # 👉 Change these image names if you want different ones
       IMAGE_BACKEND: ghcr.io/sukaina22/sms-spam-api
       IMAGE_FRONTEND: ghcr.io/sukaina22/sms-spam-ui
 
-      # 👉 Change these to match your Koyeb app + service names
       KOYEB_BACKEND_APP: sms-spam-detector-api
       KOYEB_BACKEND_SERVICE: sms-spam-api
       KOYEB_FRONTEND_APP: sms-spam-detector-ui
@@ -40,13 +38,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # ============================
-      # Build & push BACKEND image
-      # ============================
       - name: Build and push backend image
         uses: docker/build-push-action@v6
         with:
-          # 👉 Change if your backend folder is not ./backend
           context: .
           file: ./app/Dockerfile
           push: true
@@ -54,29 +48,23 @@ jobs:
             ${{ env.IMAGE_BACKEND }}:latest
             ${{ env.IMAGE_BACKEND }}:${{ github.sha }}
 
-      # ============================
-      # Build & push FRONTEND image
-      # ============================
       - name: Build and push frontend image
         uses: docker/build-push-action@v6
         with:
-          # 👉 Change if your frontend folder is not ./frontend
           context: .
           file: ./ui/Dockerfile
           push: true
+          build-args: |
+            NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
           tags: |
             ${{ env.IMAGE_FRONTEND }}:latest
             ${{ env.IMAGE_FRONTEND }}:${{ github.sha }}
 
-      # ============================
-      # Install Koyeb CLI
-      # ============================
       - name: Install Koyeb CLI
         run: |
           curl -fsSL https://raw.githubusercontent.com/koyeb/koyeb-cli/master/install.sh | sh
           echo "$HOME/.koyeb/bin" >> $GITHUB_PATH
           $HOME/.koyeb/bin/koyeb version || true
-
 
       - name: Check Koyeb CLI access (optional)
         env:
@@ -84,10 +72,6 @@ jobs:
         run: |
           koyeb --token "$KOYEB_API_TOKEN" apps list || echo "Koyeb CLI check failed, but continuing..."
 
-
-      # ============================
-      # Deploy BACKEND to Koyeb
-      # ============================
       - name: Deploy backend service
         env:
           KOYEB_API_TOKEN: ${{ secrets.KOYEB_API_TOKEN }}
@@ -97,10 +81,6 @@ jobs:
             --app "$KOYEB_BACKEND_APP" \
             --docker "${IMAGE_BACKEND}:${GITHUB_SHA}"
 
-
-      # ============================
-      # Deploy FRONTEND to Koyeb
-      # ============================
       - name: Deploy frontend service
         env:
           KOYEB_API_TOKEN: ${{ secrets.KOYEB_API_TOKEN }}
