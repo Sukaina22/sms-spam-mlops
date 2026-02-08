@@ -129,7 +129,7 @@ export default function HomePage() {
         <div className="w-full max-w-3xl grid gap-6 md:grid-cols-[2fr,1.2fr] items-start mt-8 mb-16">
           {}
           <section className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl shadow-slate-950/60">
-            <h1 className="text-xl font-semibold mb-1">Test an SMS</h1>
+            <h1 className="text-xl font-semibold mb-1">TRY IT NOW!</h1>
             <p className="text-sm text-slate-400 mb-4">
               Paste any SMS message below and let the model decide whether it&apos;s
               spam or not.
